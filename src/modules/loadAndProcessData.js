@@ -7,4 +7,5 @@ export const loadAndProcessData = () => json(dataURL)
   .then(topoJsonData => {
     const geoData = feature(topoJsonData, topoJsonData.objects.cy).features;
     return geoData;
-  });
+  })
+  .catch(error => console.error(error));
