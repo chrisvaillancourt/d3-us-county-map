@@ -2,7 +2,6 @@ import {
   select,
   geoPath,
   geoAlbersUsa,
-  json,
   scaleSequential,
   min,
   max,
@@ -10,7 +9,8 @@ import {
   zoom,
   event,
 } from 'd3';
-import { feature, } from 'topojson';
+
+import { loadAndProcessData, } from './modules/loadAndProcessData';
 
 const width = 960;
 const height = 500;
@@ -32,19 +32,15 @@ svg.call(zoom().on(`zoom`, () => {
   g.attr(`transform`, event.transform);
 }));
 
-json(`https://raw.githubusercontent.com/chrisvaillancourt/geo-data/master/school-home-retire/cy-simplified.topojson`)
-  .then(topoJsonData => {
+loadAndProcessData()
+    .then(geoData => {
 
-    const geoData = feature(topoJsonData, topoJsonData.objects.cy).features;
-    
     const minVal = min(geoData, colorValue);
     const maxVal = max(geoData, colorValue);
 
     const colorScale = scaleSequential();
-    
-    colorScale.domain([minVal, maxVal,]).interpolator(colorRamp);
-    
 
+    colorScale.domain([minVal, maxVal,]).interpolator(colorRamp);
 
     g
       .attr(`class`, `counties`)
@@ -54,5 +50,5 @@ json(`https://raw.githubusercontent.com/chrisvaillancourt/geo-data/master/school
       .append(`path`)
       .attr(`fill`, d => colorScale(d.properties[`Index: May start/return to school in next 12 mo`]))
       .attr(`d`, pathGenerator);
-    
-  });
+
+    });
